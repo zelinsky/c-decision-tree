@@ -49,19 +49,37 @@ int majorityClass(InstanceListNode* instances, int numClasses){
 char sameClass(InstanceListNode* instances){
   assert(instances != NULL);
   int class = instances->instance->class;
-  char retval = 1;
 
   InstanceListNode* current = instances->next;
 
   while (current) {
-    if (current->instance->class != class){
-      retval = 0;
-      break;
-    }
+    if (current->instance->class != class)
+      return 0;
+
     current = current->next;
   }
 
-  return retval;
+  return 1;
+}
+
+// Returns 1 if all instances have the same values for all features, 0 if not
+// Assumes sameClass has already been run on instances and returned 0 (i.e. not all the same class)
+char noisyData(InstanceListNode* instances, int numFeatures) {
+  assert(instances != NULL);
+  assert(numFeatures > 0);
+  
+  double* initFeatureValues = instances->instance->featureValues; 
+  InstanceListNode* current = instances->next;
+
+  while (current) {
+    for (int i = 0; i < numFeatures; i++)
+      if (current->instance->featureValues[i] != initFeatureValues[i])
+	return 0;
+    
+    current = current->next;
+  }
+
+  return 1;
 }
 
 // Returns the number of instances in the list that have the specified class
@@ -125,7 +143,7 @@ double info(InstanceListNode* instances, int numClasses) {
 // Returns the entropy of the list of instances split on the specified feature and split value
 double calcEntropy(InstanceListNode* instances, int feature, double split, int numClasses) {
   assert(instances != NULL);
-  assert(feature < instances->instance->numFeatures && feature >=0);
+  assert(feature < instances->instance->numFeatures && feature >= 0);
   assert(numClasses > 0);
   double infoX = 0;
   int numTotalInstances = instances->size;
@@ -186,6 +204,10 @@ DecisionTreeNode* learn(InstanceListNode* instances, int numFeatures, int parent
     node->class = parentMajority;
   } else if (sameClass(instances) == 1) {
     node->class = instances->instance->class;
+  } else if (noisyData(instances, numFeatures) == 1) {
+    node->class = majorityClass(instances, numClasses);
+    printf("\nTHE DATA HAS SOME NOISE\n");
+    printList(instances);
   } else {
     int bestFeature = 0;
     double bestSplit = 0.0;
