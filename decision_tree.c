@@ -227,6 +227,13 @@ DecisionTreeNode* learn(InstanceListNode* instances, int numFeatures, int parent
   return node;
 }
 
+// Constructs a tree on the input data and returns a pointer to it
+DecisionTree* makeTree(Names* names) {
+  DecisionTree* tree = (DecisionTree*)malloc(sizeof(DecisionTree));
+  tree->root = learn(names->instances, names->numFeatures, majorityClass(names->instances, names->numClasses), names->numClasses);
+  return tree;
+}
+
 // Returns the class that the tree gives for the instance
 int classify(DecisionTree* tree, Instance* instance) {
   assert(tree != NULL);

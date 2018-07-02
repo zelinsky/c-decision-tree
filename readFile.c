@@ -76,9 +76,8 @@ int main(int argc, char* argv[]) {
   // Print back out the data to make sure we read it in correctly
   printNames(names);
 
-  // Testing functions
-  DecisionTree* tree = (DecisionTree*)malloc(sizeof(DecisionTree));
-  tree->root = learn(names->instances, names->numFeatures, majorityClass(names->instances, names->numClasses), names->numClasses);
+  // Construt and test the tree
+  DecisionTree* tree = makeTree(names);
   printf("\nTree:\n");
   printTree(tree->root, 0);
   printf("\nAccuracy of tree: %lf\n", accuracy(tree, names->instances));

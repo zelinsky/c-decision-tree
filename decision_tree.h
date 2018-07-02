@@ -23,6 +23,7 @@ typedef struct DecisionTree {
   DecisionTreeNode* root;
 } DecisionTree;
 
+DecisionTree* makeTree(Names* names);
 int classify(DecisionTree* tree, Instance* instance);
 double accuracy(DecisionTree* tree, InstanceListNode* instances);
 int majorityClass(InstanceListNode* instances, int numClasses);
