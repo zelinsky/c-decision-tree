@@ -5,10 +5,10 @@
 
 // Instance
 // Prints out the instance's feature values and class
-void printInstance(Instance* instance) {
+void printInstance(Instance* instance, int numFeatures) {
   assert(instance != NULL);
   printf("Feature Values: ");
-   for (int i = 0; i < instance->numFeatures; i++)
+   for (int i = 0; i < numFeatures; i++)
       printf("%lf ", instance->featureValues[i]);
     printf("Class: %d", instance->class);
 }
@@ -39,10 +39,10 @@ void push(InstanceListNode** head, Instance* instance) {
 }
 
 // Prints each instance in the list
-void printList(InstanceListNode* head) {
+void printList(InstanceListNode* head, int numFeatures) {
   InstanceListNode* current = head;
   while (current){
-    printInstance(current->instance);
+    printInstance(current->instance, numFeatures);
     printf("\n");
     current = current->next;
   }
@@ -88,5 +88,5 @@ void printNames(Names* names) {
   printf("\n\n");
 
   printf("Instances\n");
-  printList(names->instances);
+  printList(names->instances, names->numFeatures);
 }

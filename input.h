@@ -4,12 +4,10 @@
 // Instance
 typedef struct Instance {
   int class;
-
-  int numFeatures;
   double* featureValues;
 } Instance;
 
-void printInstance(Instance* instance);
+void printInstance(Instance* instance, int numFeatures);
 void freeInstance(Instance* instance);
 
 
@@ -22,7 +20,7 @@ typedef struct InstanceListNode {
 } InstanceListNode;
 
 void push(InstanceListNode** head, Instance* instance);
-void printList(InstanceListNode* head);
+void printList(InstanceListNode* head, int numFeatures);
 void freeList(InstanceListNode* head);
 void freeListAndInstances(InstanceListNode* head);
 

@@ -99,7 +99,6 @@ int classFrequency(InstanceListNode* instance, int class) {
 // Returns a new list that contains only instances that have a value for the specified feature
 // either less than or equal to (for side = LEFT/0) or greater than (for side = RIGHT/1) the specified split value
 InstanceListNode* filterByFeatureValue(InstanceListNode* instances, int feature, double split, char side) {
-  assert(feature < instances->instance->numFeatures && feature >= 0);
   assert(side == LEFT || side == RIGHT);
   InstanceListNode* newList = NULL;
 
@@ -143,7 +142,6 @@ double info(InstanceListNode* instances, int numClasses) {
 // Returns the entropy of the list of instances split on the specified feature and split value
 double calcEntropy(InstanceListNode* instances, int feature, double split, int numClasses) {
   assert(instances != NULL);
-  assert(feature < instances->instance->numFeatures && feature >= 0);
   assert(numClasses > 0);
   double infoX = 0;
   int numTotalInstances = instances->size;
@@ -207,7 +205,7 @@ DecisionTreeNode* learn(InstanceListNode* instances, int numFeatures, int parent
   } else if (noisyData(instances, numFeatures) == 1) {
     node->class = majorityClass(instances, numClasses);
     printf("\nTHE DATA HAS SOME NOISE\n");
-    printList(instances);
+    printList(instances, numFeatures);
   } else {
     int bestFeature = 0;
     double bestSplit = 0.0;

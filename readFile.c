@@ -59,12 +59,11 @@ int main(int argc, char* argv[]) {
       // Instances
       Instance* instance = (Instance*)malloc(sizeof(Instance)); // Make an instance
       instance->featureValues = (double*)malloc(names->numFeatures * sizeof(double));
-      instance->numFeatures = names->numFeatures;
 
-      for (int i = 0; i < instance->numFeatures; i++) // Copy data
+      for (int i = 0; i < names->numFeatures; i++) // Copy data
 	instance->featureValues[i] = temp[i];
 
-      instance->class = (int) temp[instance->numFeatures];
+      instance->class = (int) temp[names->numFeatures];
       assert(instance->class < names->numClasses && instance->class >= 0);
 
       InstanceListNode** head = &(names->instances); // Add to front of linked list
