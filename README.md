@@ -1,7 +1,8 @@
 # c-decision-tree
 Decision Tree written in C
 
-Generate the tree and run the program using './a.out yourfilenamehere'
+Compile:'gcc readfile.c input.c decision_tree.c -lm'
+Run:	'./a.out data/yourfilenamehere'
 
 Data File Format
 ----------------------------------------------------------------------------------------------------------------------
@@ -26,3 +27,13 @@ Example
 1, 4.5, 10, 1
 4, 1.1, 12, 0
 3, 1.4, 15, 1
+
+PROPERTIES TO VERIFY
+---------------------------
+
+
+
+TO DO
+---------------------------
+- Write up files explaining data
+- Reading another file as testing data
