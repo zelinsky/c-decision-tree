@@ -54,6 +54,13 @@ Example
 
 PROPERTIES TO VERIFY
 ---------------------------
+- If the training data contains only instances of the same classification X, then all instances in the testing data will be classified as X.
+- The decision tree always terminates
+- If in the training data, feature X is most discrimatory (i.e. resulsts in the lowest entropy), X will be split on first in the learning of the tree.
+- The children nodes of a parent node will have an expected entropy less than or equal to that of the parent.
+- The learning of the decision tree will not introduce bias i.e. if all instances' classifications in the training data are independent of some feature X, then instances in the testing data will be classified independent of X.
+- Features that aren't statistiacally significant will not be split on in the learning of the tree. (Not true yet; would need to implement chi-squared pruning).
+- If there is a relationship or function between two features in all instances in the training data...
 
 
 
