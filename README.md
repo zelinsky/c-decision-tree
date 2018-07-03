@@ -11,8 +11,8 @@ Data File Format
 ----------------------------------------------------------------------------------------------------------------------
 The first line specifies the number of possible classifications and the number of features all instances have.
 
-Every line after that specifies a single instance. Each instance must have a value for all the features
-followed by its classification. The order of feature values must be the same across instances.
+Every line after that specifies a single instance. Each instance must have a numerical value for all the features
+followed by its classification (an integer). The order of feature values must be the same across instances.
 
 There can be no empty lines in the file, including at the end of the file.
 
