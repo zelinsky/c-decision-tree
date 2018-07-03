@@ -23,6 +23,7 @@ If there are three possible classes, the values of those classes are 0, 1, and 2
 And so on.
 
 
+
 Generic Format
 
 #ofClasses (N), #ofFeatures (M)
@@ -32,6 +33,7 @@ feature0, feature1, ..., featureM-1, 0 <= class < N
 feature0, feature1, ..., featureM-1, 0 <= class < N
 
 ....
+
 
 
 Example
@@ -47,6 +49,7 @@ Example
 4, 1.1, 12, 0
 
 3, 1.4, 15, 1
+
 
 
 PROPERTIES TO VERIFY
