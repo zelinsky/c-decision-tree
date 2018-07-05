@@ -127,7 +127,7 @@ int main(int argc, char* argv[]) {
     }
 
     // RUN DATA THROUGH TREE
-    //printf("\nAccuracy of tree on testing data: %lf\n", accuracy(tree, head)); // Accuracy of whole list
+    printf("\nAccuracy of tree on testing data: %lf\n", accuracy(tree, head)); // Accuracy of whole list
     printf("\nTESTING DATA:\n"); // See tree classifications of individual instances
     InstanceListNode* current = head;
     while (current) {
