@@ -4,11 +4,14 @@ Decision Tree written in C
 
 Compile:'gcc readfile.c input.c decision_tree.c -lm'
 
-Run:	'./a.out data/yourfilenamehere'
+Run:	'./a.out data/training-data-file data/testing-data-file'
+- The training data file is mandatory
+- The testing data file is optional
 
-
-Data File Format
+TRAINING DATA FILE FORMAT
 ----------------------------------------------------------------------------------------------------------------------
+This file contains information about the instances and the instances themselves which are used to create the decision tree.
+
 The first line specifies the number of possible classifications and the number of features all instances have.
 
 Every line after that specifies a single instance. Each instance must have a numerical value for all the features
@@ -51,6 +54,25 @@ Example
 3, 1.4, 15, 1
 
 
+TESTING DATA FILE FORMAT
+---------------------------
+This file contains only instances to test on the decision tree that was created with the training data.
+
+There should be no line specifying the number of classes and features, as it should be specified in the training file.
+
+The instances should be formatted as specified previously.
+
+
+
+Example
+
+1, 2.3, 34, 0
+
+2, 4.5, 42, 1
+
+3, 4.1, 50, 1
+
+
 
 PROPERTIES TO VERIFY
 ---------------------------
@@ -66,5 +88,4 @@ PROPERTIES TO VERIFY
 
 TO DO
 ---------------------------
-- Write up files explaining data
-- Reading another file as testing data
+- Add more properties
