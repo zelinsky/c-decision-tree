@@ -46,7 +46,7 @@ int majorityClass(InstanceListNode* instances, int numClasses){
 }
 
 // Returns 1 if all instances in the list have the same class, 0 if not
-char sameClass(InstanceListNode* instances){
+_Bool sameClass(InstanceListNode* instances){
   assert(instances != NULL);
   int class = instances->instance->class;
 
@@ -64,7 +64,7 @@ char sameClass(InstanceListNode* instances){
 
 // Returns 1 if all instances have the same values for all features, 0 if not
 // Assumes sameClass has already been run on instances and returned 0 (i.e. not all the same class)
-char noisyData(InstanceListNode* instances, int numFeatures) {
+_Bool noisyData(InstanceListNode* instances, int numFeatures) {
   assert(instances != NULL);
   assert(numFeatures > 0);
   
@@ -200,9 +200,9 @@ DecisionTreeNode* learn(InstanceListNode* instances, int numFeatures, int parent
 
   if (instances == NULL) {
     node->class = parentMajority;
-  } else if (sameClass(instances) == 1) {
+  } else if (sameClass(instances)) {
     node->class = instances->instance->class;
-  } else if (noisyData(instances, numFeatures) == 1) {
+  } else if (noisyData(instances, numFeatures)) {
     node->class = majorityClass(instances, numClasses);
     printf("\nTHE DATA HAS SOME NOISE\n");
     printList(instances, numFeatures);
