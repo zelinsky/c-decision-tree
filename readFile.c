@@ -45,7 +45,9 @@ int main(int argc, char* argv[]) {
   Names* names =(Names*)malloc(sizeof(Names)); // Where all the input data will be stored
   names->numClasses = 0;
   names->numFeatures = 0;
-  names->instances = NULL; // Linked list
+  names->numInstances = 0;
+
+  InstanceListNode* instancesList = NULL;
 
   // Read each line
   while (fgets(line, sizeof(line), trainFile)) {
@@ -80,12 +82,25 @@ int main(int argc, char* argv[]) {
       instance->class = (int) temp[names->numFeatures];
       assert(instance->class < names->numClasses && instance->class >= 0);
 
-      push(&(names->instances), instance); // Add to front of linked list
+      push(&(instancesList), instance); // Add to front of linked list
+      names->numInstances++; // Keep track of number of instances
     }
 
     lineNumber++;
   }
 
+  // Linked list to array
+  names->instances = (Instance**)malloc(sizeof(Instance*) * names->numInstances);
+  InstanceListNode* current = instancesList;
+  int index = 0;
+  while (current) {
+    names->instances[index] = current->instance;
+    current = current->next;
+    index++;
+  }
+  freeList(instancesList);
+
+  
   // Print back out the data to make sure we read it in correctly
   printNames(names);
 

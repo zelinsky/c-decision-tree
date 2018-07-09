@@ -25,14 +25,7 @@ void freeInstance(Instance* instance) {
 // Adds a node with the specified instance onto the front of the list (head) and assigns the new node to head
 void push(InstanceListNode** head, Instance* instance) {
   assert(instance != NULL);
-  InstanceListNode* new_node = (InstanceListNode*)malloc(sizeof(InstanceListNode));
-
-  if (*head == NULL) {
-    new_node->size = 1;
-  } else {
-    new_node->size = (*head)->size + 1;
-  }
-  
+  InstanceListNode* new_node = (InstanceListNode*)malloc(sizeof(InstanceListNode));  
   new_node->instance = instance;
   new_node->next = *head;
   *head = new_node;
@@ -59,19 +52,23 @@ void freeList(InstanceListNode* head) {
   }
 }
 
-// Frees the nodes of the list and the instances they point to
-void freeListAndInstances(InstanceListNode* head) {
-  InstanceListNode* current = head;
-  InstanceListNode* previous;
-  while(current) {
-    freeInstance(current->instance);
-    previous = current;
-    current = current->next;
-    free(previous);
+
+
+// Array
+// Prints each instance in the array
+void printInstances(Instance** instances, int numInstances, int numFeatures) {
+  for (int i = 0; i < numInstances; i++) {
+    printInstance(instances[i], numFeatures);
+    printf("\n");
   }
 }
 
-
+// Frees all the instances in the array and the array itself
+void freeArrayAndInstances(Instance** instances, int numInstances) {
+  for (int i = 0; i < numInstances; i++) 
+    freeInstance(instances[i]);
+  free(instances);
+}
 
 // Names
 // Prints out the input data (all classes, features, and instances)
@@ -88,5 +85,5 @@ void printNames(Names* names) {
   printf("\n\n");
 
   printf("Instances\n");
-  printList(names->instances, names->numFeatures);
+  printInstances(names->instances, names->numInstances, names->numFeatures);
 }

@@ -15,7 +15,6 @@ void freeInstance(Instance* instance);
 // List
 typedef struct InstanceListNode {
   Instance* instance;
-  int size; // The number of nodes to the right of this node (including this node)
   struct InstanceListNode* next;  
 } InstanceListNode;
 
@@ -24,7 +23,9 @@ void printList(InstanceListNode* head, int numFeatures);
 void freeList(InstanceListNode* head);
 void freeListAndInstances(InstanceListNode* head);
 
-
+// Array
+void printInstances(Instance** instances, int numInstances, int numFeatures);
+void freeArrayAndInstances(Instance** instances, int numInstances);
 
 // Names
 typedef struct Names { // Where all input data is held
@@ -34,8 +35,8 @@ typedef struct Names { // Where all input data is held
   // All features that the instances have
   int numFeatures;
 
-  // All instances
-  InstanceListNode* instances; // Linked list
+  int numInstances; // Number of instances
+  Instance** instances; // Array of instances
 } Names;
 
 void printNames(Names* names);

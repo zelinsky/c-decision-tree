@@ -25,7 +25,7 @@ typedef struct DecisionTree {
 
 DecisionTree* makeTree(Names* names);
 int classify(DecisionTree* tree, Instance* instance);
-double accuracy(DecisionTree* tree, InstanceListNode* instances);
+double accuracy(DecisionTree* tree, Instance** instances, int numInstances);
 void printTree(DecisionTreeNode* node, int n);
 void freeTree(DecisionTreeNode* node);
 
