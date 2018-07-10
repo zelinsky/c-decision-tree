@@ -112,8 +112,9 @@ int main(int argc, char* argv[]) {
   
   // TESTING DATA
   if (argc > 2) {
-    InstanceListNode* head = NULL;
+    printf("\nTESTING DATA:\n");
     int numInstances = 0; // Keep track of number of instance
+    int countCorrect = 0; // Keep track of how many instances have been classified by the tree correctly
 
     // READ IN DATA
     // Read each line
@@ -139,27 +140,19 @@ int main(int argc, char* argv[]) {
       instance->class = (int) temp[names->numFeatures];
       assert(instance->class < names->numClasses && instance->class >= 0);
 
-      push(&head, instance); // Add to list
-      numInstances++;
-    }
-
-    // RUN DATA THROUGH TREE
-    printf("\nTESTING DATA:\n"); // See tree classifications of individual instances
-    int countCorrect = 0;
-    InstanceListNode* current = head;
-    while (current) {
-      printInstance(current->instance, names->numFeatures);
-      int treeClass = classify(tree, current->instance);
+      // Test it
+      printInstance(instance, names->numFeatures);
+      int treeClass = classify(tree, instance);
       printf("\nTree classifies as %d\n\n", treeClass);
-      if (treeClass == current->instance->class)
+      if (treeClass == instance->class)
 	countCorrect++;
-      current = current->next;
+      numInstances++;
+
+      // Free it
+      freeInstance(instance);
     }
 
     printf("Accuracy of tree on testing data: %f\n", (double) countCorrect / (double) numInstances);
-
-    // Memory cleanup and closing streams for testing data
-    freeListAndInstances(head);
     fclose(testFile);
   }
   
