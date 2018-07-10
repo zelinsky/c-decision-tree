@@ -13,10 +13,10 @@
 void printNode(DecisionTreeNode* node) {
   assert(node != NULL);
   
-  if (node->class == -1) { 
-    printf("Feature: %d Split: %lf\n", node->feature, node->split);
+  if (!(node->isLeaf)) { 
+    printf("Feature: %d Split: %lf\n", node->info.decision.feature, node->info.decision.split);
   } else {          // Leaf Node
-    printf("Class: %d\n", node->class);
+    printf("Class: %d\n", node->info.class);
   }
 }
 
@@ -232,20 +232,23 @@ DecisionTreeNode* learn(Instance** instances, int numInstances, int numFeatures,
   DecisionTreeNode* node = (DecisionTreeNode*)malloc(sizeof(DecisionTreeNode));
 
   if (instances == NULL) {
-    node->class = parentMajority;
+    node->isLeaf = 1;
+    node->info.class = parentMajority;
   } else if (sameClass(instances, numInstances)) {
-    node->class = instances[0]->class;
+    node->isLeaf = 1;
+    node->info.class = instances[0]->class;
   } else if (noisyData(instances, numInstances, numFeatures)) {
-    node->class = majorityClass(instances, numInstances, numClasses);
+    node->isLeaf = 1;
+    node->info.class = majorityClass(instances, numInstances, numClasses);
     printf("\nTHE DATA HAS SOME NOISE\n");
     printInstances(instances, numInstances, numFeatures);
   } else {
+    node->isLeaf = 0;
     int bestFeature = 0;
     double bestSplit = 0.0;
     findBestFeatureAndSplit(instances, numInstances, numFeatures, numClasses, &bestFeature, &bestSplit);
-    node->feature = bestFeature;
-    node->split = bestSplit;
-    node->class = -1;
+    node->info.decision.feature = bestFeature;
+    node->info.decision.split = bestSplit;
 
     Instance** leftInstances = NULL;
     int numLeft = 0;
@@ -254,9 +257,9 @@ DecisionTreeNode* learn(Instance** instances, int numInstances, int numFeatures,
     split(instances, numInstances, bestFeature, bestSplit, &leftInstances, &numLeft, &rightInstances, &numRight);
     int majClass = majorityClass(instances, numInstances, numClasses);
     
-    node->left = learn(leftInstances, numLeft, numFeatures, majClass, numClasses);
+    node->info.decision.left = learn(leftInstances, numLeft, numFeatures, majClass, numClasses);
     free(leftInstances);
-    node->right = learn(rightInstances, numRight, numFeatures, majClass, numClasses);
+    node->info.decision.right = learn(rightInstances, numRight, numFeatures, majClass, numClasses);
     free(rightInstances);
   }
 
@@ -277,18 +280,18 @@ int classify(DecisionTree* tree, Instance* instance) {
   DecisionTreeNode* current = tree->root;
 
   // While the current node isn't a leaf node
-  while (current->class == -1) {
+  while (!(current->isLeaf)) {
 
     // Split on the feature and split value of the currentNode
-    if (instance->featureValues[current->feature] <= current->split) {
-      current = current->left;
+    if (instance->featureValues[current->info.decision.feature] <= current->info.decision.split) {
+      current = current->info.decision.left;
     } else {
-      current = current->right;
+      current = current->info.decision.right;
     }
   }
   
   // Return the leaf node's class
-  return current->class;
+  return current->info.class;
 }
 
 // Classifies each instance in the list of instances with the given tree, and returns
@@ -315,17 +318,17 @@ void printTree(DecisionTreeNode* node, int n) {
     printf("| ");
   printNode(node);
   
-  if (node->class == -1) {
-    printTree(node->left, n+1);
-    printTree(node->right, n+1);
+  if (!(node->isLeaf)) {
+    printTree(node->info.decision.left, n+1);
+    printTree(node->info.decision.right, n+1);
   }
 }
 
 // Frees the nodes of the tree
 void freeTree(DecisionTreeNode* node) {
-  if (node->class == -1) {
-    freeTree(node->left);
-    freeTree(node->right);
+  if (!(node->isLeaf)) {
+    freeTree(node->info.decision.left);
+    freeTree(node->info.decision.right);
   }
 
   free(node);
