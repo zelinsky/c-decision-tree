@@ -52,6 +52,18 @@ void freeList(InstanceListNode* head) {
   }
 }
 
+// Frees the nodes of the list and the instances they point to
+void freeListAndInstances(InstanceListNode* head) {
+  InstanceListNode* current = head;
+  InstanceListNode* previous;
+  while(current) {
+    freeInstance(current->instance);
+    previous = current;
+    current = current->next;
+    free(previous);
+  }
+}
+
 
 
 // Array

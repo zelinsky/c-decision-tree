@@ -108,11 +108,12 @@ int main(int argc, char* argv[]) {
   DecisionTree* tree = makeTree(names);
   printf("\nTree:\n");
   printTree(tree->root, 0);
-  printf("\nAccuracy of tree on training data: %lf\n", accuracy(tree, names->instances));
-
+  printf("\nAccuracy of tree on training data: %lf\n", accuracy(tree, names->instances, names->numInstances));
+  
   // TESTING DATA
   if (argc > 2) {
     InstanceListNode* head = NULL;
+    int numInstances = 0; // Keep track of number of instance
 
     // READ IN DATA
     // Read each line
@@ -139,17 +140,23 @@ int main(int argc, char* argv[]) {
       assert(instance->class < names->numClasses && instance->class >= 0);
 
       push(&head, instance); // Add to list
+      numInstances++;
     }
 
     // RUN DATA THROUGH TREE
-    printf("\nAccuracy of tree on testing data: %lf\n", accuracy(tree, head)); // Accuracy of whole list
     printf("\nTESTING DATA:\n"); // See tree classifications of individual instances
+    int countCorrect = 0;
     InstanceListNode* current = head;
     while (current) {
       printInstance(current->instance, names->numFeatures);
-      printf("\nTree classifies as %d\n\n", classify(tree, current->instance));
+      int treeClass = classify(tree, current->instance);
+      printf("\nTree classifies as %d\n\n", treeClass);
+      if (treeClass == current->instance->class)
+	countCorrect++;
       current = current->next;
     }
+
+    printf("Accuracy of tree on testing data: %f\n", (double) countCorrect / (double) numInstances);
 
     // Memory cleanup and closing streams for testing data
     freeListAndInstances(head);
@@ -157,7 +164,7 @@ int main(int argc, char* argv[]) {
   }
   
   // Memory cleanup
-  freeListAndInstances(names->instances);
+  freeArrayAndInstances(names->instances, names->numInstances);
   free(names);
   freeTree(tree->root);
 

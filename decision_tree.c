@@ -37,8 +37,8 @@ int majorityClass(Instance** instances, int numInstances, int numClasses){
   for (int i = 0; i < numInstances; i++)
     classCount[instances[i]->class]++;
 
-  int majClass = -1;
-  for (int i = 0; i < numClasses; i++)
+  int majClass = 0;
+  for (int i = 1; i < numClasses; i++)
     if (classCount[i] > classCount[majClass])
       majClass = i;
 
@@ -61,7 +61,7 @@ _Bool sameClass(Instance** instances, int numInstances){
 
 // Returns 1 if all instances have the same values for all features, 0 if not
 // Assumes sameClass has already been run on instances and returned 0 (i.e. not all the same class)
-_Bool noisyData(Instances** instances, int numInstances, int numFeatures) {
+_Bool noisyData(Instance** instances, int numInstances, int numFeatures) {
   assert(instances != NULL);
   assert(numInstances > 0);
   assert(numFeatures > 0);
@@ -69,7 +69,7 @@ _Bool noisyData(Instances** instances, int numInstances, int numFeatures) {
   double* initFeatureValues = instances[0]->featureValues; 
 
   for (int i = 0; i < numInstances; i++)
-    for (int i = 0; j < numFeatures; i++)
+    for (int j = 0; j < numFeatures; j++)
       if (instances[i]->featureValues[j] != initFeatureValues[j])
 	return 0;
 
@@ -94,7 +94,7 @@ void split(Instance** instances, int numInstances, int feature, double split, In
 
   int side[numInstances];
   int numLeft = 0;
-  int numRight = 0
+  int numRight = 0;
 
     for (int i = 0; i < numInstances; i++) {
       if (instances[i]->featureValues[feature] <= split) {
@@ -127,8 +127,8 @@ void split(Instance** instances, int numInstances, int feature, double split, In
   *numRightOut = numRight;
 }
 
-// Entropy helper function
-void numSplit(Instance** instances, int numInstances, int numClasses, int feature, double split, int* numLeftOut, double* infoLeftOut, int* numRightOut, double* infoRightOut) {
+// calcEntropy helper function
+void info(Instance** instances, int numInstances, int numClasses, int feature, double split, int* numLeftOut, double* infoLeftOut, int* numRightOut, double* infoRightOut) {
   assert(numClasses > 0);
   int numLeft = 0;
   int leftClassCount[numClasses];
@@ -138,21 +138,25 @@ void numSplit(Instance** instances, int numInstances, int numClasses, int featur
   int rightClassCount[numClasses];
   double infoRight = 0.0;
 
+  for (int i = 0; i < numClasses; i++) {
+    leftClassCount[i] = 0;
+    rightClassCount[i] = 0;
+  }
 
   for (int i = 0; i < numInstances; i++) {
     if (instances[i]->featureValues[feature] <= split) {
       numLeft++;
-      leftClassCount[instance[i]->class]++;
+      leftClassCount[instances[i]->class]++;
     } else {
       numRight++;
-      rightClassCount[instance[i]->class]++;
+      rightClassCount[instances[i]->class]++;
     }
   }
 
   for (int i = 0; i < numClasses; i++) {
     if (numLeft != 0) {
       double dLeft = ((double) leftClassCount[i]) / ((double) numLeft);
-
+      
       if (dLeft != 0)
 	infoLeft += -dLeft * log2(dLeft);
     }
@@ -176,20 +180,20 @@ double calcEntropy(Instance** instances, int numInstances, int feature, double s
   assert(instances != NULL);
   assert(numInstances > 0);
   assert(numClasses > 0);
-  double infoX = 0;
+  double entropy = 0;
 
-  int numLeft;
-  double infoLeft;
-  int numRight;
-  double infoRight;
+  int numLeft = 0;
+  double infoLeft = 0.0;
+  int numRight = 0;
+  double infoRight = 0.0;
 
-  numSplit(instances, numInstances, feature, split, &numLeft, &infoLeft, &numRight, &infoRight);
+  info(instances, numInstances, numClasses, feature, split, &numLeft, &infoLeft, &numRight, &infoRight);
 
-  infoX += (((double) numLeft) / numInstances) * infoLeft;
-  infoX += (((double) numRight) / numInstances) * infoRight;
+  entropy += (((double) numLeft) / numInstances) * infoLeft;
+  entropy += (((double) numRight) / numInstances) * infoRight;
 
-  assert(infoX >= 0);
-  return infoX;
+  assert(entropy >= 0);
+  return entropy;
 }
 
 // Finds the feature and split value that minimize the entropy on the list of instances
@@ -219,6 +223,8 @@ void findBestFeatureAndSplit(Instance** instances, int numInstances, int numFeat
   *splitOut = bestSplit;  
 }
 
+// Recursive function that creates a decision tree on the instances specified
+// Initial function call will return a pointer to the root node
 DecisionTreeNode* learn(Instance** instances, int numInstances, int numFeatures, int parentMajority, int numClasses) {
   assert(numFeatures > 0);
   assert(numClasses > 0);
@@ -227,28 +233,31 @@ DecisionTreeNode* learn(Instance** instances, int numInstances, int numFeatures,
 
   if (instances == NULL) {
     node->class = parentMajority;
-  } else if (sameClass(instances)) {
-    node->class = instances->instance->class;
-  } else if (noisyData(instances, numFeatures)) {
-    node->class = majorityClass(instances, numClasses);
+  } else if (sameClass(instances, numInstances)) {
+    node->class = instances[0]->class;
+  } else if (noisyData(instances, numInstances, numFeatures)) {
+    node->class = majorityClass(instances, numInstances, numClasses);
     printf("\nTHE DATA HAS SOME NOISE\n");
-    printList(instances, numFeatures);
+    printInstances(instances, numInstances, numFeatures);
   } else {
     int bestFeature = 0;
     double bestSplit = 0.0;
-    findBestFeatureAndSplit(instances, numFeatures, numClasses, &bestFeature, &bestSplit);
+    findBestFeatureAndSplit(instances, numInstances, numFeatures, numClasses, &bestFeature, &bestSplit);
     node->feature = bestFeature;
     node->split = bestSplit;
     node->class = -1;
 
-    InstanceListNode* leftList = filterByFeatureValue(instances, bestFeature, bestSplit, LEFT);
-    InstanceListNode* rightList = filterByFeatureValue(instances, bestFeature, bestSplit, RIGHT);
-    int majClass = majorityClass(instances, numClasses);
+    Instance** leftInstances = NULL;
+    int numLeft = 0;
+    Instance** rightInstances = NULL;
+    int numRight = 0;
+    split(instances, numInstances, bestFeature, bestSplit, &leftInstances, &numLeft, &rightInstances, &numRight);
+    int majClass = majorityClass(instances, numInstances, numClasses);
     
-    node->left = learn(leftList, numFeatures, majClass, numClasses);
-    freeList(leftList);
-    node->right = learn(rightList, numFeatures, majClass, numClasses);
-    freeList(rightList);
+    node->left = learn(leftInstances, numLeft, numFeatures, majClass, numClasses);
+    free(leftInstances);
+    node->right = learn(rightInstances, numRight, numFeatures, majClass, numClasses);
+    free(rightInstances);
   }
 
   return node;
@@ -288,13 +297,13 @@ double accuracy(DecisionTree* tree, Instance** instances, int numInstances) {
   assert(tree != NULL);
   assert(instances != NULL);
   assert(numInstances > 0);
-  double countCorrect = 0.0;
+  int countCorrect = 0;
 
   for (int i = 0; i < numInstances; i++)
     if (classify(tree, instances[i]) == instances[i]->class)
       countCorrect++;
   
-  return countCorrect/((double) numInstances);
+  return (double) countCorrect / (double) numInstances;
 }
 
 // Prints out the nodes of the tree in order
@@ -306,22 +315,18 @@ void printTree(DecisionTreeNode* node, int n) {
     printf("| ");
   printNode(node);
   
-  if (node->left)
+  if (node->class == -1) {
     printTree(node->left, n+1);
-
-
-
-  if (node->right)
     printTree(node->right, n+1);
+  }
 }
 
 // Frees the nodes of the tree
 void freeTree(DecisionTreeNode* node) {
-  if (node->left)
+  if (node->class == -1) {
     freeTree(node->left);
-
-  if (node->right)
     freeTree(node->right);
+  }
 
   free(node);
 }
