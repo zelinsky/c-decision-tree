@@ -8,9 +8,9 @@
 void printInstance(Instance* instance, int numFeatures) {
   assert(instance != NULL);
   printf("Feature Values: ");
-   for (int i = 0; i < numFeatures; i++)
-      printf("%lf ", instance->featureValues[i]);
-    printf("Class: %d", instance->class);
+  for (int i = 0; i < numFeatures; i++)
+    printf("%lf ", instance->featureValues[i]);
+  printf("Class: %d", instance->class);
 }
 
 // Frees the array inside of the instance, and then frees the instance itself

@@ -225,16 +225,13 @@ void findBestFeatureAndSplit(Instance** instances, int numInstances, int numFeat
 
 // Recursive function that creates a decision tree on the instances specified
 // Initial function call will return a pointer to the root node
-DecisionTreeNode* learn(Instance** instances, int numInstances, int numFeatures, int parentMajority, int numClasses) {
+DecisionTreeNode* learn(Instance** instances, int numInstances, int numFeatures, int numClasses) {
   assert(numFeatures > 0);
   assert(numClasses > 0);
-  assert(parentMajority < numClasses && parentMajority >= 0);
+
   DecisionTreeNode* node = (DecisionTreeNode*)malloc(sizeof(DecisionTreeNode));
 
-  if (instances == NULL) {
-    node->isLeaf = 1;
-    node->info.class = parentMajority;
-  } else if (sameClass(instances, numInstances)) {
+  if (sameClass(instances, numInstances)) {
     node->isLeaf = 1;
     node->info.class = instances[0]->class;
   } else if (noisyData(instances, numInstances, numFeatures)) {
@@ -255,11 +252,10 @@ DecisionTreeNode* learn(Instance** instances, int numInstances, int numFeatures,
     Instance** rightInstances = NULL;
     int numRight = 0;
     split(instances, numInstances, bestFeature, bestSplit, &leftInstances, &numLeft, &rightInstances, &numRight);
-    int majClass = majorityClass(instances, numInstances, numClasses);
     
-    node->info.decision.left = learn(leftInstances, numLeft, numFeatures, majClass, numClasses);
+    node->info.decision.left = learn(leftInstances, numLeft, numFeatures, numClasses);
     free(leftInstances);
-    node->info.decision.right = learn(rightInstances, numRight, numFeatures, majClass, numClasses);
+    node->info.decision.right = learn(rightInstances, numRight, numFeatures, numClasses);
     free(rightInstances);
   }
 
@@ -269,7 +265,7 @@ DecisionTreeNode* learn(Instance** instances, int numInstances, int numFeatures,
 // Constructs a tree on the input data and returns a pointer to it
 DecisionTree* makeTree(Names* names) {
   DecisionTree* tree = (DecisionTree*)malloc(sizeof(DecisionTree));
-  tree->root = learn(names->instances, names->numInstances, names->numFeatures, majorityClass(names->instances, names->numInstances, names->numClasses), names->numClasses);
+  tree->root = learn(names->instances, names->numInstances, names->numFeatures, names->numClasses);
   return tree;
 }
 

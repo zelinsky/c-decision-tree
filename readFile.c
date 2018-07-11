@@ -87,8 +87,11 @@ int main(int argc, char* argv[]) {
     }
 
     lineNumber++;
+    fclose(stream);
   }
-
+  
+  fclose(trainFile);
+  
   // Linked list to array
   names->instances = (Instance**)malloc(sizeof(Instance*) * names->numInstances);
   InstanceListNode* current = instancesList;
@@ -150,6 +153,7 @@ int main(int argc, char* argv[]) {
 
       // Free it
       freeInstance(instance);
+      fclose(stream);
     }
 
     printf("Accuracy of tree on testing data: %f\n", (double) countCorrect / (double) numInstances);
@@ -160,10 +164,11 @@ int main(int argc, char* argv[]) {
   freeArrayAndInstances(names->instances, names->numInstances);
   free(names);
   freeTree(tree->root);
+  free(tree);
 
   // Close streams
-  fclose(stream);
-  fclose(trainFile);
+  //fclose(stream);
+  // fclose(trainFile);
   
   return 0;
 }
