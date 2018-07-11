@@ -45,7 +45,9 @@ int main(int argc, char* argv[]) {
   Names* names =(Names*)malloc(sizeof(Names)); // Where all the input data will be stored
   names->numClasses = 0;
   names->numFeatures = 0;
-  names->instances = NULL; // Linked list
+  names->numInstances = 0;
+
+  InstanceListNode* instancesList = NULL;
 
   // Read each line
   while (fgets(line, sizeof(line), trainFile)) {
@@ -80,12 +82,28 @@ int main(int argc, char* argv[]) {
       instance->class = (int) temp[names->numFeatures];
       assert(instance->class < names->numClasses && instance->class >= 0);
 
-      push(&(names->instances), instance); // Add to front of linked list
+      push(&(instancesList), instance); // Add to front of linked list
+      names->numInstances++; // Keep track of number of instances
     }
 
     lineNumber++;
+    fclose(stream);
   }
+  
+  fclose(trainFile);
+  
+  // Linked list to array
+  names->instances = (Instance**)malloc(sizeof(Instance*) * names->numInstances);
+  InstanceListNode* current = instancesList;
+  int index = 0;
+  while (current) {
+    names->instances[index] = current->instance;
+    current = current->next;
+    index++;
+  }
+  freeList(instancesList);
 
+  
   // Print back out the data to make sure we read it in correctly
   printNames(names);
 
@@ -93,11 +111,13 @@ int main(int argc, char* argv[]) {
   DecisionTree* tree = makeTree(names);
   printf("\nTree:\n");
   printTree(tree->root, 0);
-  printf("\nAccuracy of tree on training data: %lf\n", accuracy(tree, names->instances));
-
+  printf("\nAccuracy of tree on training data: %lf\n", accuracy(tree, names->instances, names->numInstances));
+  
   // TESTING DATA
   if (argc > 2) {
-    InstanceListNode* head = NULL;
+    printf("\nTESTING DATA:\n");
+    int numInstances = 0; // Keep track of number of instance
+    int countCorrect = 0; // Keep track of how many instances have been classified by the tree correctly
 
     // READ IN DATA
     // Read each line
@@ -123,32 +143,32 @@ int main(int argc, char* argv[]) {
       instance->class = (int) temp[names->numFeatures];
       assert(instance->class < names->numClasses && instance->class >= 0);
 
-      push(&head, instance); // Add to list
+      // Test it
+      printInstance(instance, names->numFeatures);
+      int treeClass = classify(tree, instance);
+      printf("\nTree classifies as %d\n\n", treeClass);
+      if (treeClass == instance->class)
+	countCorrect++;
+      numInstances++;
+
+      // Free it
+      freeInstance(instance);
+      fclose(stream);
     }
 
-    // RUN DATA THROUGH TREE
-    printf("\nAccuracy of tree on testing data: %lf\n", accuracy(tree, head)); // Accuracy of whole list
-    printf("\nTESTING DATA:\n"); // See tree classifications of individual instances
-    InstanceListNode* current = head;
-    while (current) {
-      printInstance(current->instance, names->numFeatures);
-      printf("\nTree classifies as %d\n\n", classify(tree, current->instance));
-      current = current->next;
-    }
-
-    // Memory cleanup and closing streams for testing data
-    freeListAndInstances(head);
+    printf("Accuracy of tree on testing data: %f\n", (double) countCorrect / (double) numInstances);
     fclose(testFile);
   }
   
   // Memory cleanup
-  freeListAndInstances(names->instances);
+  freeArrayAndInstances(names->instances, names->numInstances);
   free(names);
   freeTree(tree->root);
+  free(tree);
 
   // Close streams
-  fclose(stream);
-  fclose(trainFile);
+  //fclose(stream);
+  // fclose(trainFile);
   
   return 0;
 }

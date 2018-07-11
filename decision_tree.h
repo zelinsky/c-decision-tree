@@ -5,13 +5,18 @@
 
 // Node
 typedef struct DecisionTreeNode {
-  struct DecisionTreeNode* left;  // For feature values <= the split
-  struct DecisionTreeNode* right; // For feature values > the split
-  int feature; // The feature to split on
-  double split; // The value to split at
+  _Bool isLeaf;
+  union {
+    struct {
+      struct DecisionTreeNode* left;  // For feature values <= the split
+      struct DecisionTreeNode* right; // For feature values > the split
+      int feature; // The feature to split on
+      double split; // The value to split at
+    } decision;
 
-  // Leaf Node
-  int class; // The classification
+    // Leaf Node
+    int class; // The classification
+  } info;
 } DecisionTreeNode;
 
 void printNode(DecisionTreeNode* node);
@@ -25,7 +30,7 @@ typedef struct DecisionTree {
 
 DecisionTree* makeTree(Names* names);
 int classify(DecisionTree* tree, Instance* instance);
-double accuracy(DecisionTree* tree, InstanceListNode* instances);
+double accuracy(DecisionTree* tree, Instance** instances, int numInstances);
 void printTree(DecisionTreeNode* node, int n);
 void freeTree(DecisionTreeNode* node);
 
