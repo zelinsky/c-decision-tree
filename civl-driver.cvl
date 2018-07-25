@@ -15,9 +15,9 @@ $input double featureValues[n][f]; // array of feature values of instances
 
 //$assume(n>0 && f>0 && c>0); // lowerbounds
 //$assume(n<=nU && f<=fU && c<=cU); // upperbounds
-$assume(n == 5 && f == 3 && c == 2);
-$assume($forall(int i | i >= 0 && i < n - 2) classes[i] == 0);
-$assume($forall(int i | i >= n-2 && i < n) classes[i] == 1);
+$assume(n == 2 && f == 2 && c == 2);
+$assume($forall(int i | i >= 0 && i < n/2) classes[i] == 0);
+$assume($forall(int i | i >= n/2 && i < n) classes[i] == 1);
 $assume($forall(int i | i >= 0 && i < n) $forall(int j | j >= 0 && j < f) featureValues[i][j] == i+j);
 
 void main() {

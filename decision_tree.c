@@ -211,7 +211,7 @@ void findBestFeatureAndSplit(Instance** instances, int numInstances, int numFeat
     for (int j = 0; j < numInstances; j++) {
 
       double entropy = calcEntropy(instances, numInstances, i, instances[j]->featureValues[i], numClasses);
-      if (minEntropy == -1 || entropy < minEntropy) {
+      if (entropy < minEntropy || minEntropy == -1) {
 	minEntropy = entropy;
 	bestFeature = i;
 	bestSplit = instances[j]->featureValues[i];
