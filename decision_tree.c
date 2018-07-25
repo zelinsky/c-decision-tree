@@ -163,7 +163,7 @@ void info(Instance** instances, int numInstances, int numClasses, int feature, d
 
     if (numRight != 0){
       double dRight = ((double) rightClassCount[i]) / ((double) numRight);
-
+      
       if (dRight != 0)
 	infoRight += -dRight * log2(dRight);
     }
@@ -192,7 +192,7 @@ double calcEntropy(Instance** instances, int numInstances, int feature, double s
   entropy += (((double) numLeft) / numInstances) * infoLeft;
   entropy += (((double) numRight) / numInstances) * infoRight;
 
-  assert(entropy >= 0);
+  //assert(entropy >= 0); (CIVL will not work well enough with log2 to verify this)
   return entropy;
 }
 
