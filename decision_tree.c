@@ -192,7 +192,7 @@ double calcEntropy(Instance** instances, int numInstances, int feature, double s
   entropy += (((double) numLeft) / numInstances) * infoLeft;
   entropy += (((double) numRight) / numInstances) * infoRight;
 
-  //assert(entropy >= 0); (CIVL will not work well enough with log2 to verify this)
+  assert(entropy >= 0);
   return entropy;
 }
 
