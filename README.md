@@ -73,3 +73,15 @@ Example
 3, 4.1, 50, 1
 
 # Verification
+
+**You will need [CIVL](https://vsl.cis.udel.edu/civl/) to verify this program.**
+
+Setup: You will need to edit the Makefile to include the path to the civl jar file on your computer.
+
+Verification of the decision tree program is broken into two parts:
+ 1. Verification of the construction of the tree itself, with the function for picking the best feature abstracted away
+ 2. Verification of the function for picking the best feature
+
+To verify the first part:   'make verify_tree'
+
+To verify the second part:  'make verify_entropy'
