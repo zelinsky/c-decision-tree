@@ -15,7 +15,7 @@ $assume(n<=10 && f<=5 && c<=5); // upperbounds
 $assume($forall(int i | i >= 0 && i < n) classes[i] >= 0 && classes[i] < c);
 $assume($forall(int i | i >= 0 && i < n) $forall(int j | j >= 0 && j < f) featureValues[i][j] >= 0);
 //Feature values are ordered across instances
-$assume($forall(int i | i >= 0 && i < n-1) $forall(int j | j >= 0 && j < f) featureValues[i][j] <= featureValues[i+1][j]);
+$assume($forall(int i | i >= 0 && i < n-1) $forall(int j | j >= 0 && j < f) featureValues[i][j] < featureValues[i+1][j]);
 
 void main() {
   Names* names = (Names*)malloc(sizeof(Names));

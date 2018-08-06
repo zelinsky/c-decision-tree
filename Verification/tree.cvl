@@ -127,20 +127,11 @@ void split(Instance** instances, int numInstances, int feature, double split, In
   *numRightOut = numRight;
 }
 
-// Returns a random, unique entropy value for abstraction purposes, but this will not work for us, since we need to pick
-// a feature and split value that sends at least once instance to the left node and one to the right node
-/*double calcEntropy(Instance** instances, int numInstances, int feature, double split, int numClasses) {
-  double x;
-  $havoc(&x);
-  $assume(x >= 0);
-  return x;
-  }*/
-
-// 'Abstraction' of real findBestFeatureAndSplit function for tree verification purposes
+// 'Abstraction' of the real findBestFeatureAndSplit function for tree verification purposes
 // Finds a feature and split value that will split the instances so that a least one instance goes to the left node
 // and at least one goes to the right node
 // Changes the input parameters featureOut and splitOut to the chosen feature and split value
-void findBestFeatureAndSplit(Instance** instances, int numInstances, int numFeatures, int numClasses, int* featureOut, double* splitOut) {
+void findAFeatureAndSplit(Instance** instances, int numInstances, int numFeatures, int numClasses, int* featureOut, double* splitOut) {
   assert(instances != NULL);
   assert(numFeatures > 0);
   assert(numClasses > 0);
@@ -191,7 +182,7 @@ DecisionTreeNode* learn(Instance** instances, int numInstances, int numFeatures,
     node->isLeaf = 0;
     int bestFeature = 0;
     double bestSplit = 0.0;
-    findBestFeatureAndSplit(instances, numInstances, numFeatures, numClasses, &bestFeature, &bestSplit);
+    findAFeatureAndSplit(instances, numInstances, numFeatures, numClasses, &bestFeature, &bestSplit);
     node->info.decision.feature = bestFeature;
     node->info.decision.split = bestSplit;
 
