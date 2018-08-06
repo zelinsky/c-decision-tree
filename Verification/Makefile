@@ -1,4 +1,4 @@
-CIVL=java -jar -Xmx3g /home/zelinsky/Documents/Summer2018/CIVL-1.16_4871/lib/civl-1.16_4871.jar
+CIVL=java -jar /path/CIVL-x/lib/civl-x.jar
 VERIFY=$(CIVL) verify
 
 all: verify_tree verify_entropy clean
