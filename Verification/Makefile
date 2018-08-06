@@ -1,3 +1,5 @@
+HEADERS = input.h decision_tree.h
+
 CIVL=java -jar /path/CIVL-x/lib/civl-x.jar
 VERIFY=$(CIVL) verify
 
