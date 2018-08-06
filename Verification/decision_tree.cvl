@@ -1,0 +1,280 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
+#include <math.h>
+#include "decision_tree.h"
+#include "input.h"
+
+#define LEFT 0
+#define RIGHT 1
+
+// Node
+// Prints out the feature and split value of the node or the class if it is a lead node
+void printNode(DecisionTreeNode* node) {
+  assert(node != NULL);
+  
+  if (!(node->isLeaf)) { 
+    printf("Feature: %d Split: %lf\n", node->info.decision.feature, node->info.decision.split);
+  } else {          // Leaf Node
+    printf("Class: %d\n", node->info.class);
+  }
+}
+
+
+
+// Tree
+// Returns the class that appears the most in the array of instances
+int majorityClass(Instance** instances, int numInstances, int numClasses){
+  assert(instances != NULL);
+  assert(numInstances > 0);
+  assert(numClasses > 0);
+  
+  int classCount[numClasses];
+
+  for (int i = 0; i < numClasses; i++)
+    classCount[i] = 0;
+
+  for (int i = 0; i < numInstances; i++)
+    classCount[instances[i]->class]++;
+
+  int majClass = 0;
+  for (int i = 1; i < numClasses; i++)
+    if (classCount[i] > classCount[majClass])
+      majClass = i;
+
+  return majClass;
+}
+
+// Returns 1 if all instances in the array have the same class, 0 if not
+_Bool sameClass(Instance** instances, int numInstances){
+  assert(instances != NULL);
+  assert(numInstances > 0);
+  
+  int class = instances[0]->class;
+
+  for (int i = 0; i < numInstances; i++)
+    if (instances[i]->class != class)
+      return 0;
+
+  return 1;
+}
+
+// Returns 1 if all instances have the same values for all features, 0 if not
+// Assumes sameClass has already been run on instances and returned 0 (i.e. not all the same class)
+_Bool noisyData(Instance** instances, int numInstances, int numFeatures) {
+  assert(instances != NULL);
+  assert(numInstances > 0);
+  assert(numFeatures > 0);
+  
+  double* initFeatureValues = instances[0]->featureValues; 
+
+  for (int i = 0; i < numInstances; i++)
+    for (int j = 0; j < numFeatures; j++)
+      if (instances[i]->featureValues[j] != initFeatureValues[j])
+	return 0;
+
+  return 1;
+}
+
+// Returns the number of instances in the array that have the specified class
+int classFrequency(Instance** instances, int numInstances, int class) {
+  int freq = 0;
+
+  for (int i = 0; i < numInstances; i++)
+    if (instances[i]->class == class)
+      freq++;
+
+  return freq;
+}
+
+// Splits the given array of instances into a left array and a right array based on the given feature and split value
+// Instances in the left array have a value that is less than or equal to the split for the specified feature
+// Instances in the right aeeay have a value that is greater than the split for the specified feature
+void split(Instance** instances, int numInstances, int feature, double split, Instance*** leftOut, int* numLeftOut, Instance*** rightOut, int* numRightOut) {
+
+  int side[numInstances];
+  int numLeft = 0;
+  int numRight = 0;
+
+    for (int i = 0; i < numInstances; i++) {
+      if (instances[i]->featureValues[feature] <= split) {
+	side[i] = LEFT;
+	numLeft++;
+      } else {
+	side[i] = RIGHT;
+	numRight++;
+      }
+    }
+
+  Instance** left = (Instance**)malloc(sizeof(Instance*) * numLeft);
+  Instance** right = (Instance**)malloc(sizeof(Instance*) * numRight);
+
+  int leftIndex = 0;
+  int rightIndex = 0;
+  for (int i = 0; i < numInstances; i++) {
+    if (side[i] == LEFT) {
+      left[leftIndex] = instances[i];
+      leftIndex++;
+    } else {
+      right[rightIndex] = instances[i];
+      rightIndex++;
+    }
+  }
+
+  *leftOut = left;
+  *numLeftOut = numLeft;
+  *rightOut = right;
+  *numRightOut = numRight;
+}
+
+// Returns a random, unique entropy value for abstraction purposes, but this will not work for us, since we need to pick
+// a feature and split value that sends at least once instance to the left node and one to the right node
+/*double calcEntropy(Instance** instances, int numInstances, int feature, double split, int numClasses) {
+  double x;
+  $havoc(&x);
+  $assume(x >= 0);
+  return x;
+  }*/
+
+// 'Abstraction' of real findBestFeatureAndSplit function for tree verification purposes
+// Finds a feature and split value that will split the instances so that a least one instance goes to the left node
+// and at least one goes to the right node
+// Changes the input parameters featureOut and splitOut to the chosen feature and split value
+void findBestFeatureAndSplit(Instance** instances, int numInstances, int numFeatures, int numClasses, int* featureOut, double* splitOut) {
+  assert(instances != NULL);
+  assert(numFeatures > 0);
+  assert(numClasses > 0);
+  
+  for (int i = 0; i < numFeatures; i++) {
+
+    for (int j = 0; j < numInstances; j++) {
+
+      int countLeft = 0;
+      int countRight = 0;
+      for (int k = 0; k < numInstances; k++) {
+
+	if (instances[k]->featureValues[i] <= instances[j]->featureValues[i]) {
+	  countLeft++;
+	} else {
+	  countRight++;
+	}
+
+	if (countLeft > 0 && countRight > 0) {
+	  *featureOut = i;
+	  *splitOut = instances[i]->featureValues[j];
+	  return;
+	}
+      }
+    }
+  }
+  printf("SHOULD NEVER REACH HERE\n");
+  //return;
+}
+
+// Recursive function that creates a decision tree on the instances specified
+// Initial function call will return a pointer to the root node
+DecisionTreeNode* learn(Instance** instances, int numInstances, int numFeatures, int numClasses) {
+  assert(numFeatures > 0);
+  assert(numClasses > 0);
+
+  DecisionTreeNode* node = (DecisionTreeNode*)malloc(sizeof(DecisionTreeNode));
+
+  if (sameClass(instances, numInstances)) {
+    node->isLeaf = 1;
+    node->info.class = instances[0]->class;
+  } else if (noisyData(instances, numInstances, numFeatures)) {
+    node->isLeaf = 1;
+    node->info.class = majorityClass(instances, numInstances, numClasses);
+    printf("\nTHE DATA HAS SOME NOISE\n");
+    printInstances(instances, numInstances, numFeatures);
+  } else {
+    node->isLeaf = 0;
+    int bestFeature = 0;
+    double bestSplit = 0.0;
+    findBestFeatureAndSplit(instances, numInstances, numFeatures, numClasses, &bestFeature, &bestSplit);
+    node->info.decision.feature = bestFeature;
+    node->info.decision.split = bestSplit;
+
+    Instance** leftInstances = NULL;
+    int numLeft = 0;
+    Instance** rightInstances = NULL;
+    int numRight = 0;
+    split(instances, numInstances, bestFeature, bestSplit, &leftInstances, &numLeft, &rightInstances, &numRight);
+    
+    node->info.decision.left = learn(leftInstances, numLeft, numFeatures, numClasses);
+    free(leftInstances);
+    node->info.decision.right = learn(rightInstances, numRight, numFeatures, numClasses);
+    free(rightInstances);
+  }
+
+  return node;
+}
+
+// Constructs a tree on the input data and returns a pointer to it
+DecisionTree* makeTree(Names* names) {
+  DecisionTree* tree = (DecisionTree*)malloc(sizeof(DecisionTree));
+  tree->root = learn(names->instances, names->numInstances, names->numFeatures, names->numClasses);
+  return tree;
+}
+
+// Returns the class that the tree gives for the instance
+int classify(DecisionTree* tree, Instance* instance) {
+  assert(tree != NULL);
+  assert(instance != NULL);
+  DecisionTreeNode* current = tree->root;
+
+  // While the current node isn't a leaf node
+  while (!(current->isLeaf)) {
+
+    // Split on the feature and split value of the currentNode
+    if (instance->featureValues[current->info.decision.feature] <= current->info.decision.split) {
+      current = current->info.decision.left;
+    } else {
+      current = current->info.decision.right;
+    }
+  }
+  
+  // Return the leaf node's class
+  return current->info.class;
+}
+
+// Classifies each instance in the list of instances with the given tree, and returns
+// the ratio of correct classifications to the number of instances in the list
+double accuracy(DecisionTree* tree, Instance** instances, int numInstances) {
+  assert(tree != NULL);
+  assert(instances != NULL);
+  assert(numInstances > 0);
+  int countCorrect = 0;
+
+  for (int i = 0; i < numInstances; i++)
+    if (classify(tree, instances[i]) == instances[i]->class)
+      countCorrect++;
+  
+  return (double) countCorrect / (double) numInstances;
+}
+
+// Prints out the nodes of the tree in order
+// Call the function with n=0
+void printTree(DecisionTreeNode* node, int n) {
+  assert(node != NULL);
+
+  for (int i = 0; i < n; i++)
+    printf("| ");
+  printNode(node);
+  
+  if (!(node->isLeaf)) {
+    printTree(node->info.decision.left, n+1);
+    printTree(node->info.decision.right, n+1);
+  }
+}
+
+// Frees the nodes of the tree
+void freeTree(DecisionTreeNode* node) {
+  if (!(node->isLeaf)) {
+    freeTree(node->info.decision.left);
+    freeTree(node->info.decision.right);
+  }
+
+  free(node);
+}
+  

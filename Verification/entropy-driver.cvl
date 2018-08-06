@@ -1,0 +1,50 @@
+#include <civlc.cvh>
+#include <stdio.h>
+#include <stdlib.h>
+#include "decision_tree.h"
+#include "input.h"
+
+$input int n; // number of instances
+$input int f; // number of features each instance has
+$input int c; // numer of unique classes
+$input int classes[n]; // array of classes of instances
+$input double featureValues[n][f]; // array of feature values of instances
+
+$assume(n>0 && f>0 && c>1); // lowerbounds
+$assume(n<=3 && f<=3 && c<=3); // upperbounds
+
+$assume($forall(int i | i >= 0 && i < n) classes[i] >= 0 && classes[i] < c);
+// At least two instances must have different classes -> entropy verification purposes
+$assume($exists(int i | i >= 0 && i < n) $exists(int j | j >= 0 && j < n) i != j && classes[i] != classes[j]);
+$assume($forall(int i | i >= 0 && i < n) $forall(int j | j >= 0 && j < f) featureValues[i][j] >= 0);
+// Feature values are ordered across instances
+// This also ensures that there is no noise in the data -> entropy verification purposes
+$assume($forall(int i | i >= 0 && i < n-1) $forall(int j | j >= 0 && j < f) featureValues[i][j] < featureValues[i+1][j]);
+
+void main() {
+  Names* names = (Names*)malloc(sizeof(Names));
+  names->numClasses = c;
+  names->numFeatures = f;
+  names->numInstances = n;
+  names->instances = (Instance**)malloc(sizeof(Instance*) * names->numInstances);
+
+  $elaborate(c);
+  $elaborate(f);
+  $elaborate(n);
+  for (int i = 0; i < n; i++) {
+    Instance* instance = (Instance*)malloc(sizeof(Instance));
+    instance->featureValues = featureValues[i];
+    instance->class = classes[i];
+
+    names->instances[i] = instance;
+  }
+
+  printNames(names);
+
+  verifyEntropy(names);
+
+  for (int i = 0; i < n; i++)
+    free(names->instances[i]);
+  free(names->instances);
+  free(names);
+}

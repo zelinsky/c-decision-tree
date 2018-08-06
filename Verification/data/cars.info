@@ -1,0 +1,44 @@
+CLASSES
+------------------
+0 -> Unacceptable
+1 -> Acceptable
+2 -> Good
+3 -> Very Good
+
+
+FEATURES (IN ORDER)
+------------------
+Buying Price:
+0 -> Low
+1 -> Medium
+2 -> High
+3 -> Very High
+
+Maintenance Price:
+0 -> Low
+1 -> Medium
+2 -> High
+3 -> Very High
+
+Number of Doors:
+2 -> 2 Doors
+3 -> 3 Doors
+4 -> 4 Doors
+5 -> 5+ Doors
+
+Capacity (in people):
+2 -> 2 People
+4 -> 4 People
+5 -> 5+ People
+
+Trunk Size:
+0 -> Small
+1 -> Medium
+2 -> Large
+
+Saftey Rating:
+0 -> Low
+1 -> Medium
+2 -> High
+
+

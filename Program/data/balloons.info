@@ -1,0 +1,22 @@
+CLASSES
+-------------------
+0 -> Failed
+1 -> Inflated
+
+FEATURES
+-------------------
+Color of Balloon:
+0 -> Yellow
+1 -> Blue
+
+Size of Balloon:
+2 -> Small
+3 -> Large
+
+Method of Preparation:
+4 -> Stretched
+5 -> Dipped in Water
+
+Age of Participant:
+6 -> Adult
+7 -> Child
