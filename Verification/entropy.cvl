@@ -268,13 +268,16 @@ DecisionTreeNode* learn(Instance** instances, int numInstances, int numFeatures,
   return node;
 }
 
+// A function used for verification purposes of choosing the best feature and split
 void verifyEntropy(Names* names) {
   assert(names->numFeatures > 0);
   assert(names->numClasses > 0);
 
+  // We need to be able to split the instances
   assert(!sameClass(names->instances, names->numInstances));
   assert(!noisyData(names->instances, names->numInstances, names->numFeatures));
 
+  // Find the best feature and split and split the instances
   int bestFeature = 0;
   double bestSplit = 0.0;
   findBestFeatureAndSplit(names->instances, names->numInstances, names->numFeatures, names->numClasses, &bestFeature, &bestSplit);
@@ -293,6 +296,7 @@ void verifyEntropy(Names* names) {
   printInstances(rightInstances, numRight, names->numFeatures);
   printf("\n");
     
+  // Memory cleanup
   free(leftInstances);
   free(rightInstances);
 }

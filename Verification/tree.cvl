@@ -136,15 +136,17 @@ void findAFeatureAndSplit(Instance** instances, int numInstances, int numFeature
   assert(numFeatures > 0);
   assert(numClasses > 0);
   
-  for (int i = 0; i < numFeatures; i++) {
+  for (int i = 0; i < numFeatures; i++) { // i: current feature
 
     for (int j = 0; j < numInstances; j++) {
 
+      int curVal = instances[j]->featureValues[i]; // current split value
       int countLeft = 0;
       int countRight = 0;
+
       for (int k = 0; k < numInstances; k++) {
 
-	if (instances[k]->featureValues[i] <= instances[j]->featureValues[i]) {
+	if (instances[k]->featureValues[i] <= curVal) {
 	  countLeft++;
 	} else {
 	  countRight++;
@@ -152,14 +154,14 @@ void findAFeatureAndSplit(Instance** instances, int numInstances, int numFeature
 
 	if (countLeft > 0 && countRight > 0) {
 	  *featureOut = i;
-	  *splitOut = instances[i]->featureValues[j];
+	  *splitOut = curVal;
 	  return;
 	}
       }
     }
   }
   printf("SHOULD NEVER REACH HERE\n");
-  //return;
+  return;
 }
 
 // Recursive function that creates a decision tree on the instances specified

@@ -12,12 +12,19 @@ $input double featureValues[n][f]; // array of feature values of instances
 
 $assume(n>0 && f>0 && c>0); // lowerbounds
 $assume(n<=10 && f<=5 && c<=5); // upperbounds
+
+// all classes must be between 0 and c-1 inclusive
 $assume($forall(int i | i >= 0 && i < n) classes[i] >= 0 && classes[i] < c);
+
+// all feature values must be positive
 $assume($forall(int i | i >= 0 && i < n) $forall(int j | j >= 0 && j < f) featureValues[i][j] >= 0);
-//Feature values are ordered across instances
+
+// feature values are ordered across instances
 $assume($forall(int i | i >= 0 && i < n-1) $forall(int j | j >= 0 && j < f) featureValues[i][j] < featureValues[i+1][j]);
 
 void main() {
+
+  // Convert inputs to a Names struct
   Names* names = (Names*)malloc(sizeof(Names));
   names->numClasses = c;
   names->numFeatures = f;
@@ -35,13 +42,16 @@ void main() {
     names->instances[i] = instance;
   }
 
+  // Inputs
   printNames(names);
 
+  // Tree
   DecisionTree* tree = makeTree(names);
   printf("\nTree:\n");
   printTree(tree->root, 0);
   printf("\nAccuracy of tree on training data: %lf\n", accuracy(tree, names->instances, names->numInstances));
 
+  // Memory cleanup
   freeTree(tree->root);
   free(tree);
   for (int i = 0; i < n; i++)
